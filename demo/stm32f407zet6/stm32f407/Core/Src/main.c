@@ -105,6 +105,7 @@ int main(void)
 		HAL_Delay(500);
 		
 		printf_dma("hhh");
+		
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
