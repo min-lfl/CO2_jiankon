@@ -19,12 +19,14 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "dma.h"
+#include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "Printf_DMA.H"
+#include "Printf_DMA.H"	//导入串口打印的头文件
+#include "SCD40.H"			//导入二氧化碳传感器的头文件
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,7 +58,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+SCD40_Data_TypeDef SCD40_Data1={0};
 /* USER CODE END 0 */
 
 /**
@@ -90,21 +92,44 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_USART1_UART_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-
+	SCD40_Init();		//二氧化碳传感器初始化
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		//单片机测试代码
-		HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,GPIO_PIN_SET);
-		HAL_Delay(500);
-		HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,GPIO_PIN_RESET);
-		HAL_Delay(500);
+//		//单片机测试代码
+//		HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,GPIO_PIN_SET);
+//		HAL_Delay(500);
+//		HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,GPIO_PIN_RESET);
+//		HAL_Delay(500);
 		
-		printf_dma("hhh");
+		
+		// //串口打印测试代码
+		// printf_dma("hhh");
+
+
+		//读取二氧化碳传感器的数据
+		SCD40_Read_Data(&SCD40_Data1);
+
+    //数据结构
+    // //存储传感器数据的结构体
+    // typedef struct{
+    // 	uint16_t	CO2;					//CO2浓度的成员，单位ppm
+    // 	uint8_t		Temperature;	//温度成员变量，单位摄氏度oC
+    // 	uint8_t		Humidity;			//湿度成员结构体变量，单位%
+    // }SCD40_Data_TypeDef;
+		
+    
+    printf_dma("CO2: %d ppm\r\n",SCD40_Data1.CO2);  								//打印二氧化碳浓度
+    printf_dma("Temperature: %d oC\r\n",SCD40_Data1.Temperature);  	//打印温度
+    printf_dma("Humidity: %d %%\r\n",SCD40_Data1.Humidity);  				//打印湿度
+    printf_dma("\r\n");  																						//打印换行,隔离每组数据
+    HAL_Delay(500);  //延时500ms
+		
 		
     /* USER CODE END WHILE */
 
